@@ -119,3 +119,11 @@ Once built and deployed, access the MicroPython REPL (the Python prompt) via USB
 serial or UART, depending on the board.  For the pyboard you can try:
 
     $ picocom /dev/ttyACM0
+    
+```
+d:\dfutil\dfu-util.exe  -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
+```
+    
+```
+./uf2conv.py -c -f 0x57755a57 -b 0x08010000 build-MEOWBIT/firmware.hex -o meowpy.uf2
+```

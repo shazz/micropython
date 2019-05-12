@@ -55,6 +55,7 @@
 #include "modmachine.h"
 #include "extmod/vfs.h"
 #include "extmod/utime_mphal.h"
+#include "display/ST7735.h"
 
 STATIC mp_obj_t pyb_fault_debug(mp_obj_t value) {
     pyb_hard_fault_debug = mp_obj_is_true(value);
@@ -231,6 +232,10 @@ STATIC const mp_rom_map_elem_t pyb_module_globals_table[] = {
 
 #if MICROPY_HW_HAS_LCD
     { MP_ROM_QSTR(MP_QSTR_LCD), MP_ROM_PTR(&pyb_lcd_type) },
+#endif
+
+#if MICROPY_HW_HAS_ST7735
+    { MP_ROM_QSTR(MP_QSTR_SCREEN), MP_ROM_PTR(&pyb_screen_type) },
 #endif
 };
 

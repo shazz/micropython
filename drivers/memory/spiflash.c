@@ -48,7 +48,7 @@
 #define WAIT_SR_TIMEOUT (1000000)
 
 #define PAGE_SIZE (256) // maximum bytes we can write in one SPI transfer
-#define SECTOR_SIZE MP_SPIFLASH_ERASE_BLOCK_SIZE
+#define SECTOR_SIZE MP_SPIFLASH_ERASE_BLOCK_SIZE // 4096
 
 STATIC void mp_spiflash_acquire_bus(mp_spiflash_t *self) {
     const mp_spiflash_config_t *c = self->config;
@@ -128,14 +128,19 @@ STATIC void mp_spiflash_write_cmd_addr(mp_spiflash_t *self, uint8_t cmd, uint32_
 
 STATIC int mp_spiflash_wait_sr(mp_spiflash_t *self, uint8_t mask, uint8_t val, uint32_t timeout) {
     uint8_t sr;
-    do {
+    for (; timeout; --timeout) {
         sr = mp_spiflash_read_cmd(self, CMD_RDSR, 1);
         if ((sr & mask) == val) {
-            return 0; // success
+            break;
         }
-    } while (timeout--);
-
-    return -MP_ETIMEDOUT;
+    }
+    if ((sr & mask) == val) {
+        return 0; // success
+    } else if (timeout == 0) {
+        return -MP_ETIMEDOUT;
+    } else {
+        return -MP_EIO;
+    }
 }
 
 STATIC int mp_spiflash_wait_wel1(mp_spiflash_t *self) {

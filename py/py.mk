@@ -287,6 +287,8 @@ PY_EXTMOD_O_BASENAME = \
 	extmod/moduwebsocket.o \
 	extmod/modwebrepl.o \
 	extmod/modframebuf.o \
+	extmod/images/gif.o \
+	extmod/images/bmp.o \
 	extmod/vfs.o \
 	extmod/vfs_reader.o \
 	extmod/vfs_posix.o \

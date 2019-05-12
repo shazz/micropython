@@ -1,6 +1,6 @@
 # Select the board to build for: if not given on the command line,
 # then default to PYBV10.
-BOARD ?= PYBV10
+BOARD ?= MEOWBIT
 
 # If the build directory is not given, make it reflect the board name.
 BUILD ?= build-$(BOARD)
@@ -25,6 +25,7 @@ FROZEN_MPY_DIR ?= modules
 include $(TOP)/py/py.mk
 
 LD_DIR=boards
+DISPLAY_DIR ?= display/
 CMSIS_DIR=$(TOP)/lib/stm32lib/CMSIS/STM32$(MCU_SERIES_UPPER)xx/Include
 MCU_SERIES_UPPER = $(shell echo $(MCU_SERIES) | tr '[:lower:]' '[:upper:]')
 HAL_DIR=lib/stm32lib/STM32$(MCU_SERIES_UPPER)xx_HAL_Driver
@@ -54,6 +55,7 @@ INC += -I$(TOP)/$(HAL_DIR)/Inc
 INC += -I$(USBDEV_DIR)/core/inc -I$(USBDEV_DIR)/class/inc
 #INC += -I$(USBHOST_DIR)
 INC += -Ilwip_inc
+INC += -I$(DISPLAY_DIR)
 
 # Basic Cortex-M flags
 CFLAGS_CORTEX_M = -mthumb
@@ -276,6 +278,7 @@ SRC_C = \
 	servo.c \
 	dac.c \
 	adc.c \
+	$(DISPLAY_DIR)/ST7735.c \
 	$(wildcard $(BOARD_DIR)/*.c)
 
 ifeq ($(MCU_SERIES),f0)
