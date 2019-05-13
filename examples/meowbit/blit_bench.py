@@ -1,3 +1,10 @@
+#
+# Warning! Changing frequencies will disconnect the USB link but the 
+# tests will continue.
+# Simply reset the Meowbit and reload MicroPython and get the results
+# in results.csv on th flash or on the SD card
+#
+
 import pyb
 import framebuf
 import time
@@ -32,6 +39,7 @@ def run_tests(freqs, fb):
 fbuf = bytearray(160*128*2)
 results_str = "type;freqs;average\n"
 
+# Default frequencies. Refer to the STM32F4 User Manual for limits
 #sysclk: frequency of the CPU				: 56000000 
 #hclk: frequency of the AHB bus, core memory and DMA	: 56000000
 #pclk1: frequency of the APB1 bus			: 14000000
@@ -66,7 +74,7 @@ for freqs in freqs_test:
 
 print("Loading PAL16 image...")
 fb16 = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL16, 160, framebuf.PAL16_C64)
-f = open("images/dragoon.p16", "rb")
+f = open("images/test.p16", "rb")
 f.readinto(fbuf)
 f.close()
 
