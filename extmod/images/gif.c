@@ -6,11 +6,10 @@
 
 #include "py/runtime.h"
 
-#if MICROPY_HW_ENABLE_GIF
+#if MICROPY_HW_ENABLE_IMAGE
 #include "gif.h"
 #include "py/mphal.h"
 #include <py/misc.h>
-#include "extmod/modframebuf.h"
 
 // defined for fs operation
 #include "lib/oofatfs/ff.h"
@@ -18,6 +17,7 @@
 #include "extmod/vfs_fat.h"
 
 extern fs_user_mount_t fs_user_mount_flash;
+mp_obj_framebuf_t * _fb;
 
 const uint16_t _aMaskTbl[16] =
 {
@@ -30,8 +30,6 @@ const uint8_t _aInterlaceOffset[]={8,8,4,2};
 const uint8_t _aInterlaceYPos[]={0,4,2,1};
  
 uint8_t gifdecoding=0;//标记GIF正在解码.
-
-extern mp_obj_framebuf_t * _fb;
 
 uint8_t gif_check_head(FIL *file)
 {
@@ -452,13 +450,15 @@ void gif_quit(void)
     gifdecoding=0;
 }
 
-mp_obj_t gif_load(const char *filename, mp_int_t x, mp_int_t y, mp_obj_t callback)
+mp_obj_t gif_load(mp_obj_framebuf_t * fb, const char *filename, mp_int_t x, mp_int_t y, mp_obj_t callback)
 {
     FIL gfile;
     gif89a *mygif89a;
     int res = 0;
     uint16_t dtime=0;//解码延时
     fs_user_mount_t *vfs_fat = &fs_user_mount_flash;
+
+    _fb = fb;
 
     mygif89a=(gif89a*) m_malloc(sizeof(gif89a));
     if (!mygif89a){
@@ -510,4 +510,4 @@ mp_obj_t gif_load(const char *filename, mp_int_t x, mp_int_t y, mp_obj_t callbac
     return mp_const_none;
 }
 
-#endif // MICROPY_HW_ENABLE_GIF
+#endif // MICROPY_HW_ENABLE_IMAGE

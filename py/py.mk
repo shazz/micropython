@@ -289,6 +289,7 @@ PY_EXTMOD_O_BASENAME = \
 	extmod/modframebuf.o \
 	extmod/images/gif.o \
 	extmod/images/bmp.o \
+	extmod/modimage.o \
 	extmod/vfs.o \
 	extmod/vfs_reader.o \
 	extmod/vfs_posix.o \

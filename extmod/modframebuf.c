@@ -33,9 +33,6 @@
 #if MICROPY_PY_FRAMEBUF
 
 #include "ports/stm32/font_petme128_8x8.h"
-
-#include "images/bmp.h"
-#include "images/gif.h"
 #include "modframebuf.h"
 
 // Functions for MHLSB and MHMSB
@@ -612,45 +609,6 @@ STATIC mp_obj_t framebuf_text(size_t n_args, const mp_obj_t *args) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_text_obj, 4, 5, framebuf_text);
 
-#if MICROPY_HW_ENABLE_BMP
-STATIC mp_obj_t framebuf_loadbmp(size_t n_args, const mp_obj_t *args) {
-    (void)n_args;
-    mp_obj_framebuf_t *self = MP_OBJ_TO_PTR(args[0]);
-    const char *filename = mp_obj_str_get_str(args[1]);
-    mp_int_t x0 = 0;
-    mp_int_t y0 = 0;
-    if (n_args > 2){
-        x0 = mp_obj_get_int(args[2]);
-        y0 = mp_obj_get_int(args[3]);
-    }
-
-    return load_bmp(self, filename, x0, y0);
-}
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_loadbmp_obj, 2, 4, framebuf_loadbmp);
-#endif // MICROPY_HW_ENABLE_BMP
-
-#if MICROPY_HW_ENABLE_GIF
-mp_obj_framebuf_t * _fb;
-STATIC mp_obj_t framebuf_loadgif(size_t n_args, const mp_obj_t *args) {
-    
-    (void)n_args;
-
-    _fb = MP_OBJ_TO_PTR(args[0]);
-    const char *filename = mp_obj_str_get_str(args[1]);
-    mp_obj_t callback = MP_OBJ_TO_PTR(args[2]);
-    mp_int_t x = 0;
-    mp_int_t y = 0;
-    if (n_args > 3){
-        x = mp_obj_get_int(args[3]);
-        y = mp_obj_get_int(args[4]);
-    }
-   
-    return gif_load(filename, x, y, callback);
-
-}
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuf_loadgif_obj, 3, 5, framebuf_loadgif);
-#endif // MICROPY_HW_ENABLE_GIF
-
 STATIC const mp_rom_map_elem_t framebuf_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_fill), MP_ROM_PTR(&framebuf_fill_obj) },
     { MP_ROM_QSTR(MP_QSTR_fill_rect), MP_ROM_PTR(&framebuf_fill_rect_obj) },
@@ -662,12 +620,6 @@ STATIC const mp_rom_map_elem_t framebuf_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_blit), MP_ROM_PTR(&framebuf_blit_obj) },
     { MP_ROM_QSTR(MP_QSTR_scroll), MP_ROM_PTR(&framebuf_scroll_obj) },
     { MP_ROM_QSTR(MP_QSTR_text), MP_ROM_PTR(&framebuf_text_obj) },
-#if MICROPY_HW_ENABLE_BMP   
-    { MP_ROM_QSTR(MP_QSTR_loadbmp), MP_ROM_PTR(&framebuf_loadbmp_obj) },
-#endif
-#if MICROPY_HW_ENABLE_GIF    
-    { MP_ROM_QSTR(MP_QSTR_loadgif), MP_ROM_PTR(&framebuf_loadgif_obj) },
-#endif
 };
 STATIC MP_DEFINE_CONST_DICT(framebuf_locals_dict, framebuf_locals_dict_table);
 

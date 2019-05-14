@@ -219,6 +219,9 @@ STATIC const mp_rom_map_elem_t mp_builtin_module_table[] = {
 #if MICROPY_PY_FRAMEBUF
     { MP_ROM_QSTR(MP_QSTR_framebuf), MP_ROM_PTR(&mp_module_framebuf) },
 #endif
+#if MICROPY_PY_IMAGE
+    { MP_ROM_QSTR(MP_QSTR_image), MP_ROM_PTR(&mp_module_image) },
+#endif
 #if MICROPY_PY_BTREE
     { MP_ROM_QSTR(MP_QSTR_btree), MP_ROM_PTR(&mp_module_btree) },
 #endif

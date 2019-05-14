@@ -5,7 +5,7 @@
 
 #include "py/runtime.h"
 
-#if MICROPY_HW_ENABLE_BMP
+#if MICROPY_HW_ENABLE_IMAGE
 #include "bmp.h"
 #include "py/mphal.h"
 #include <py/misc.h>
@@ -19,8 +19,11 @@ extern fs_user_mount_t fs_user_mount_flash;
 
 mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp_int_t y0)
 {
+
+    printf("load_bmp");
+
     fs_user_mount_t *vfs_fat = &fs_user_mount_flash;
-    uint8_t res;
+    FRESULT res;
     UINT br;
     uint8_t rgb ,color_byte;
     uint32_t color;
@@ -43,9 +46,15 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
     uint16_t rowlen;
     BITMAPINFO *pbmp;
 
+    printf("Malloc for %d bytes\n", readlen);
     databuf = (uint8_t*) m_malloc(readlen);
+
+    printf("Open VFS %s\n", filename);
+
+    //FRESULT res = f_open(&vfs->fatfs, &o->fp, fname, mode);
+    //if (res != FR_OK) {    
     res = f_open(&vfs_fat->fatfs, &fp, filename, FA_READ);
-    if (res == 0){
+    if (res == FR_OK){
         res = f_read(&fp, databuf, readlen, &br);
         
         pbmp=(BITMAPINFO*)databuf;
@@ -68,9 +77,10 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
         bmpbuf=databuf;
 
         if (color_byte!=3 && color_byte!=4){
-            printf("only support 24/32 bit bmp\r\n");
+            printf("Only support 24/32 bit bmp\r\n");
         }
 
+        printf("Reading BMP content\n");
         while(1){
             while(count<readlen){  //读取一簇1024扇区 (SectorsPerClust 每簇扇区数)
                 if(color_byte==3){   //24位颜色图
@@ -129,9 +139,12 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
         }
         f_close(&fp);
     }
+    else{
+        printf("Error while reading file: %d\n", res);
+    }
     m_free(databuf);
 
     return mp_const_none;
 }
 
-#endif // MICROPY_HW_ENABLE_BMP
+#endif // MICROPY_HW_ENABLE_IMAGE

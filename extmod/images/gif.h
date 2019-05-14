@@ -2,6 +2,7 @@
 #define __GIF_H__
 
 #include <stdint.h>
+#include "extmod/modframebuf.h"
 
 #define MAX_NUM_LWZ_BITS 	12
 
@@ -70,6 +71,6 @@ typedef struct __attribute__((packed))
 	LZW_INFO *lzw;					//LZW信息
 }gif89a;
 
-mp_obj_t gif_load(const char *filename, mp_int_t x, mp_int_t y, mp_obj_t callback);
+mp_obj_t gif_load(mp_obj_framebuf_t * fb, const char *filename, mp_int_t x, mp_int_t y, mp_obj_t callback);
 
 #endif
