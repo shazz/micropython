@@ -16,7 +16,6 @@
 #include "extmod/vfs.h"
 #include "extmod/vfs_fat.h"
 
-extern fs_user_mount_t fs_user_mount_flash;
 mp_obj_framebuf_t * _fb;
 
 const uint16_t _aMaskTbl[16] =
@@ -456,7 +455,18 @@ mp_obj_t gif_load(mp_obj_framebuf_t * fb, const char *filename, mp_int_t x, mp_i
     gif89a *mygif89a;
     int res = 0;
     uint16_t dtime=0;//解码延时
-    fs_user_mount_t *vfs_fat = &fs_user_mount_flash;
+    const char *p_out;
+    fs_user_mount_t *vfs_fat;    
+
+    // retrieve VFS FAT mount
+    mp_vfs_mount_t *vfs = mp_vfs_lookup_path(filename, &p_out);
+    if (vfs != MP_VFS_NONE && vfs != MP_VFS_ROOT) {
+        vfs_fat = MP_OBJ_TO_PTR(vfs->obj);
+    }
+    else {
+        printf("Cannot find user mount for %s\n", filename);
+        return mp_const_none;
+    }    
 
     _fb = fb;
 

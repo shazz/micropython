@@ -15,14 +15,14 @@
 #include "extmod/vfs.h"
 #include "extmod/vfs_fat.h"
 
-extern fs_user_mount_t fs_user_mount_flash;
-
 mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp_int_t y0)
 {
 
     printf("load_bmp");
 
-    fs_user_mount_t *vfs_fat = &fs_user_mount_flash;
+    const char *p_out;
+    fs_user_mount_t *vfs_fat;
+
     FRESULT res;
     UINT br;
     uint8_t rgb ,color_byte;
@@ -45,6 +45,16 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
 
     uint16_t rowlen;
     BITMAPINFO *pbmp;
+
+    // retrieve VFS FAT mount
+    mp_vfs_mount_t *vfs = mp_vfs_lookup_path(filename, &p_out);
+    if (vfs != MP_VFS_NONE && vfs != MP_VFS_ROOT) {
+        vfs_fat = MP_OBJ_TO_PTR(vfs->obj);
+    }
+    else {
+        printf("Cannot find user mount for %s\n", filename);
+        return mp_const_none;
+    }    
 
     printf("Malloc for %d bytes\n", readlen);
     databuf = (uint8_t*) m_malloc(readlen);
