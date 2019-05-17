@@ -14,6 +14,9 @@ ch = tim.channel(3, Timer.PWM, pin=buzz)
 noteMap = [440, 494, 262, 294, 330, 349, 392]
 
 def tone(freq, d=1000):
+    if freq == 0:
+        delay(d)
+        return
     tim.freq(freq)
     ch.pulse_width_percent(30)
     delay(d)
