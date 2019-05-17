@@ -44,6 +44,7 @@ Major components in this repository:
   HTML documentation is available at http://docs.micropython.org.
 
 Additional components:
+- ports/stm32/ -- a version of MicroPython that runs on STM32 based MCUs.
 - ports/bare-arm/ -- a bare minimum version of MicroPython for ARM MCUs. Used
   mostly to control code size.
 - ports/teensy/ -- a version of MicroPython that runs on the Teensy 3.1
@@ -164,6 +165,21 @@ This will use the included `tools/pydfu.py` script.  If flashing the firmware
 does not work it may be because you don't have the correct permissions, and
 need to use `sudo make deploy`.
 See the README.md file in the ports/stm32/ directory for further details.
+
+The Meowbit version
+-------------------
+
+The Meowbit version is based on the STM32 port and support some additional features:
+- `pyb.SCREEN()` to get access to the TFT 160x128 RGB565 screen controller  
+- `image` module to load BMP and animated GIF images, converted to `Framebuf`
+
+To build (same dependencies as STM32 build)
+
+    $ git submodule update --init
+    $ cd ports/stm32
+    $ make all
+    $ python boards/MEOWBIT/uf2conv.py -c -f 0x57755a57 -b 0x08010000 build-MEOWBIT/firmware.hex -o build-MEOWBIT/meowpy.uf2
+    $ cp build-MEOWBIT/meowpy.uf2 /media/<your user>/ARCADE-F4/
 
 Contributing
 ------------
