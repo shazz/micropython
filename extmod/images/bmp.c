@@ -17,9 +17,6 @@
 
 mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp_int_t y0)
 {
-
-    printf("load_bmp");
-
     const char *p_out;
     fs_user_mount_t *vfs_fat;
 
@@ -56,10 +53,8 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
         return mp_const_none;
     }    
 
-    printf("Malloc for %d bytes\n", readlen);
+    //printf("Malloc for %d bytes\n", readlen);
     databuf = (uint8_t*) m_malloc(readlen);
-
-    printf("Open VFS %s\n", filename);
 
     //FRESULT res = f_open(&vfs->fatfs, &o->fp, fname, mode);
     //if (res != FR_OK) {    
@@ -90,7 +85,6 @@ mp_obj_t load_bmp(mp_obj_framebuf_t *self, const char *filename, mp_int_t x0, mp
             printf("Only support 24/32 bit bmp\r\n");
         }
 
-        printf("Reading BMP content\n");
         while(1){
             while(count<readlen){  //读取一簇1024扇区 (SectorsPerClust 每簇扇区数)
                 if(color_byte==3){   //24位颜色图

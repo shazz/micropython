@@ -862,14 +862,11 @@ static uint8 locateSOIMarker(PicoJpeg *pjp)
    if ((lastchar == 0xFF) && (thischar == M_SOI))
       return 0;
 
-   printf("lastchar: %x thischar: %x\n", lastchar, thischar);
-
    bytesleft = 4096; //512;
 
    for ( ; ; )
    {
       if (--bytesleft == 0) {
-         printf("PJPG_NOT_JPEG 869\n");
          return PJPG_NOT_JPEG;
       }
 
@@ -882,7 +879,6 @@ static uint8 locateSOIMarker(PicoJpeg *pjp)
          if (thischar == M_SOI)
             break;
          else if (thischar == M_EOI) {	//getBits1 will keep returning M_EOI if we read past the end
-            printf("PJPG_NOT_JPEG 882\n");
             return PJPG_NOT_JPEG;
          }
       }
@@ -2525,7 +2521,6 @@ unsigned char pjpeg_set_window(pjpeg_image_info_t *pInfo, unsigned int width_pix
       unsigned int height_pixels, int left_offset_pixels, int top_offset_pixels) {
    PicoJpeg *pjp;
    if (pInfo == 0 || (pjp = pInfo->m_PJHandle) == 0 || pjp->ImageXSize == 0 || pjp->ImageYSize == 0) {
-      printf("PJPG_NOT_JPEG 2525\n");
       return(PJPG_NOT_JPEG);
    }
    width_pixels &= ~1U;

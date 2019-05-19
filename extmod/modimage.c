@@ -95,12 +95,8 @@ STATIC int sinkfn(void *buffer, int size, void *pdata) {
 STATIC mp_obj_t image_loadjpeg(size_t n_args, const mp_obj_t *args) {
     (void)n_args;
 
-    printf("Loading JPEG\n");
-
     mp_obj_image_t *self = MP_OBJ_TO_PTR(args[0]);
     const char *filename = mp_obj_str_get_str(args[1]);
-
-    printf("filename: %s\n", filename);
 
     FIL fp;
     FRESULT res;
@@ -153,35 +149,35 @@ STATIC mp_obj_t image_loadjpeg(size_t n_args, const mp_obj_t *args) {
                     printf("Not enough memory\n");
                 }
                 else {
-                    printf("Memory allocation: %u for internal decoder, %u for linebuf\n", pjpeg_get_storage_size(), linebuf_size);      
+                    //printf("Memory allocation: %u for internal decoder, %u for linebuf\n", pjpeg_get_storage_size(), linebuf_size);      
                     cb.fb = self->fb->buf;
                     status = pjpeg_decode_scanlines(&image_info, sinkfn, &cb);
                     m_free(image_info.m_linebuf);
-                    
+
                     if (status)
                     {
                         printf("pjpeg_decode_scanlines() failed with status %u\n", status);
                     }
-                    else {
-                        char *p = m_malloc(4);
-                        switch (image_info.m_scanType)
-                        {
-                            case PJPG_GRAYSCALE:    strcpy(p, "GRAY"); break;
-                            case PJPG_YH1V1:        strcpy(p, "H1V1"); break;
-                            case PJPG_YH2V1:        strcpy(p, "H2V1"); break;
-                            case PJPG_YH1V2:        strcpy(p, "H1V2"); break;
-                            case PJPG_YH2V2:        strcpy(p, "H2V2"); break;
-                            default:                strcpy(p, "UNKN");
-                        }
-                        printf("Width: %d, Height: %d, Comps: %d, Scan type: %d ->%s\n", image_info.m_width, image_info.m_height, image_info.m_comps, image_info.m_scanType, p);
-                        m_free(p);
-                    }
+                    // else {
+                    //     char *p = m_malloc(4);
+                    //     switch (image_info.m_scanType)
+                    //     {
+                    //         case PJPG_GRAYSCALE:    strcpy(p, "GRAY"); break;
+                    //         case PJPG_YH1V1:        strcpy(p, "H1V1"); break;
+                    //         case PJPG_YH2V1:        strcpy(p, "H2V1"); break;
+                    //         case PJPG_YH1V2:        strcpy(p, "H1V2"); break;
+                    //         case PJPG_YH2V2:        strcpy(p, "H2V2"); break;
+                    //         default:                strcpy(p, "UNKN");
+                    //     }
+                    //     printf("Width: %d, Height: %d, Comps: %d, Scan type: %d ->%s\n", image_info.m_width, image_info.m_height, image_info.m_comps, image_info.m_scanType, p);
+                    //     m_free(p);
+                    // }
                 }
 
             }
         }
 
-        printf("Cleaning resources\n");
+        //printf("Cleaning resources\n");
         f_close(&fp);
         m_free(storage);
     }
@@ -194,11 +190,94 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(image_loadjpeg_obj, 2, 2, image_loadj
 #endif // MICROPY_HW_IMAGE_JPEG
 
 // --------------------------------------------------------------------------------------------------------------------
+#ifdef MICROPY_HW_IMAGE_P16
+STATIC mp_obj_t image_loadp16(size_t n_args, const mp_obj_t *args) {
+    (void)n_args;
+
+    mp_obj_image_t *self = MP_OBJ_TO_PTR(args[0]);
+    const char *filename = mp_obj_str_get_str(args[1]);
+
+    FIL fp;
+    FRESULT res;
+    const char *p_out;
+    fs_user_mount_t *vfs_fat;      
+
+    // retrieve VFS FAT mount
+    mp_vfs_mount_t *vfs = mp_vfs_lookup_path(filename, &p_out);
+    if (vfs != MP_VFS_NONE && vfs != MP_VFS_ROOT) {
+        vfs_fat = MP_OBJ_TO_PTR(vfs->obj);
+    }
+    else {
+        printf("Cannot find user mount for %s\n", filename);
+        return mp_const_none;
+    }   
+
+    // TODO: add reading palette information
+    res = f_open(&vfs_fat->fatfs, &fp, filename, FA_READ);
+    if (res == FR_OK) {    
+        UINT n;
+        FRESULT res;
+        res = f_read(&fp, self->fb->buf, 80*128, &n);
+        if (res != FR_OK) {   
+            printf("Cannot read P16 image\n");
+        }
+    }
+    else {
+        printf("Cannot load P16 image\n");
+    }
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(image_loadp16_obj, 2, 4, image_loadp16);
+#endif //MICROPY_HW_IMAGE_P16
+
+// --------------------------------------------------------------------------------------------------------------------
+#ifdef MICROPY_HW_IMAGE_P256
+STATIC mp_obj_t image_loadp256(size_t n_args, const mp_obj_t *args) {
+    (void)n_args;
+
+    mp_obj_image_t *self = MP_OBJ_TO_PTR(args[0]);
+    const char *filename = mp_obj_str_get_str(args[1]);
+
+    FIL fp;
+    FRESULT res;
+    const char *p_out;
+    fs_user_mount_t *vfs_fat;      
+
+    // retrieve VFS FAT mount
+    mp_vfs_mount_t *vfs = mp_vfs_lookup_path(filename, &p_out);
+    if (vfs != MP_VFS_NONE && vfs != MP_VFS_ROOT) {
+        vfs_fat = MP_OBJ_TO_PTR(vfs->obj);
+    }
+    else {
+        printf("Cannot find user mount for %s\n", filename);
+        return mp_const_none;
+    }   
+
+    // TODO: add reading palette information
+    res = f_open(&vfs_fat->fatfs, &fp, filename, FA_READ);
+    if (res == FR_OK) {    
+        UINT n;
+        FRESULT res;
+        res = f_read(&fp, self->fb->buf, 160*128, &n);
+        if (res != FR_OK) {   
+            printf("Cannot read P256 image\n");
+        }
+    }
+    else {
+        printf("Cannot load P256 image\n");
+    }
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(image_loadp256_obj, 2, 4, image_loadp256);
+#endif //MICROPY_HW_IMAGE_P256
+
+
+// --------------------------------------------------------------------------------------------------------------------
 #ifdef MICROPY_HW_IMAGE_BMP
 STATIC mp_obj_t image_loadbmp(size_t n_args, const mp_obj_t *args) {
     (void)n_args;
-
-    printf("Loading BMP\n");
 
     mp_obj_image_t *self = MP_OBJ_TO_PTR(args[0]);
     const char *filename = mp_obj_str_get_str(args[1]);
@@ -206,12 +285,10 @@ STATIC mp_obj_t image_loadbmp(size_t n_args, const mp_obj_t *args) {
     mp_int_t x = 0;
     mp_int_t y = 0;
 
-    if (n_args > 2){
+    if (n_args > 2) {
         x = mp_obj_get_int(args[2]);
         y = mp_obj_get_int(args[3]);
     }
-
-    printf("filename: %s\n", filename);
 
     return load_bmp(self->fb, filename, x, y);
 }
@@ -221,7 +298,6 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(image_loadbmp_obj, 2, 4, image_loadbm
 // --------------------------------------------------------------------------------------------------------------------
 #ifdef MICROPY_HW_IMAGE_GIF
 STATIC mp_obj_t image_loadgif(size_t n_args, const mp_obj_t *args) {
-    
     (void)n_args;
 
     mp_obj_image_t *self = MP_OBJ_TO_PTR(args[0]);
@@ -254,6 +330,12 @@ STATIC const mp_rom_map_elem_t image_locals_dict_table[] = {
 #ifdef MICROPY_HW_IMAGE_JPEG        
     { MP_ROM_QSTR(MP_QSTR_loadjpeg), MP_ROM_PTR(&image_loadjpeg_obj) },
 #endif
+#ifdef MICROPY_HW_IMAGE_P16  
+    { MP_ROM_QSTR(MP_QSTR_loadp16), MP_ROM_PTR(&image_loadp16_obj) },
+#endif
+#ifdef MICROPY_HW_IMAGE_P256
+    { MP_ROM_QSTR(MP_QSTR_loadp256), MP_ROM_PTR(&image_loadp256_obj) },
+#endif
 };
 STATIC MP_DEFINE_CONST_DICT(image_locals_dict, image_locals_dict_table);
 
@@ -276,7 +358,13 @@ STATIC const mp_rom_map_elem_t image_module_globals_table[] = {
 #endif
 #ifdef MICROPY_HW_IMAGE_JPEG
     { MP_ROM_QSTR(MP_QSTR_loadjpeg), MP_ROM_PTR(&image_loadjpeg_obj) },
-#endif    
+#endif
+#ifdef MICROPY_HW_IMAGE_P16
+    { MP_ROM_QSTR(MP_QSTR_loadp16), MP_ROM_PTR(&image_loadp16_obj) },
+#endif   
+#ifdef MICROPY_HW_IMAGE_P256
+    { MP_ROM_QSTR(MP_QSTR_loadp256), MP_ROM_PTR(&image_loadp256_obj) },
+#endif   
 };
 STATIC MP_DEFINE_CONST_DICT(image_module_globals, image_module_globals_table);
 
