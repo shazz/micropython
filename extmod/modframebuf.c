@@ -225,8 +225,6 @@ void gs4_hmsb_fill_rect(const mp_obj_framebuf_t *fb, int x, int y, int w, int h,
 }
 
 // Functions for GS8 format
-//#define COL08(r, g, b) ((((r) >> 5) << 5) | (((g) >> 5) << 2) | ((b) >> 6))
-//#define COL8(c) COL08((c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff)
 void gs8_setpixel(const mp_obj_framebuf_t *fb, int x, int y, uint32_t col) {
     uint8_t *pixel = &((uint8_t*)fb->buf)[(x + y * fb->stride)];
     *pixel = (col & 0xff);
@@ -673,6 +671,7 @@ STATIC const mp_rom_map_elem_t framebuf_module_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR_PAL16_APPLE2), MP_ROM_INT(FRAMEBUF_PAL16_APPLE2) },
     { MP_ROM_QSTR(MP_QSTR_PAL16_CGA), MP_ROM_INT(FRAMEBUF_PAL16_CGA) },
     { MP_ROM_QSTR(MP_QSTR_PAL16_MSX), MP_ROM_INT(FRAMEBUF_PAL16_MSX) },
+    { MP_ROM_QSTR(MP_QSTR_PAL16_ADAPTIVE_GS), MP_ROM_INT(FRAMEBUF_PAL16_ADAPTIVE_GS) },
     { MP_ROM_QSTR(MP_QSTR_PAL256_676), MP_ROM_INT(FRAMEBUF_PAL256_676) },
     { MP_ROM_QSTR(MP_QSTR_PAL256_685), MP_ROM_INT(FRAMEBUF_PAL256_685) }, 
     { MP_ROM_QSTR(MP_QSTR_PAL256_884), MP_ROM_INT(FRAMEBUF_PAL256_884) },        

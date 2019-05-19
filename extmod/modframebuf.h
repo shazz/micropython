@@ -44,6 +44,7 @@
 #define FRAMEBUF_PAL16_CGA      (3)
 #define FRAMEBUF_PAL16_MSX      (4)
 #define FRAMEBUF_PAL16_SPECTRUM (5)
+#define FRAMEBUF_PAL16_ADAPTIVE_GS (6)
 
 #define FRAMEBUF_PAL256_676     (0)
 #define FRAMEBUF_PAL256_685     (1)

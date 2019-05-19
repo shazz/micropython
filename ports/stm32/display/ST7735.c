@@ -133,6 +133,25 @@ const uint16_t spectrum_palette16[] = {
 	COL(0xFFFFFF), // 15
 };
 
+const uint16_t adaptive_gs16_palette16[] = {
+	COL(0x040204), // 0
+	COL(0x888888), // 1
+	COL(0xC8C7C8), // 2
+	COL(0x484848), // 3
+	COL(0xA8A8A8), // 4
+	COL(0xE8E8E8), // 5
+	COL(0x686868), // 6
+	COL(0x282728), // 7
+	COL(0x989898), // 8
+	COL(0x171917), // 9
+	COL(0xD8D7D8), // 10
+	COL(0x575857), // 11
+	COL(0xB8B8B8), // 12
+	COL(0xFCFEFC), // 13
+	COL(0x787878), // 14
+	COL(0x393839), // 15
+};
+
 const uint16_t rgb676_palette256[] = {
 	COL(0x000000), // 0
 	COL(0x000033), // 1
@@ -916,7 +935,8 @@ const uint16_t * palettes16[] = {
     apple2_palette16,
     cga_palette16,
     msx_palette16,
-    spectrum_palette16
+    spectrum_palette16,
+	adaptive_gs16_palette16
 };
 
 const uint16_t * palettes256[] = {
@@ -1202,7 +1222,6 @@ STATIC mp_obj_t pyb_screen_show(size_t n_args, const mp_obj_t *args) {
 
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(pyb_screen_show_obj, 2, 2, pyb_screen_show);
 
-//STATIC mp_obj_t pyb_screen_show(size_t n_args, const mp_obj_t *args) {
 STATIC mp_obj_t pyb_screen_set_window(size_t n_args, const mp_obj_t *args) {
     (void)n_args;
 

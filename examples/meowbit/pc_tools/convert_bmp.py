@@ -45,7 +45,7 @@ def remap(buffer, pal_src, pal_dest):
                 sel = dist
         remap.append(idx)
 
-    print("reammping table computed")
+    print("remapping table computed")
     for i in range(0, 256):
         print(i, pal_src[i], 'is mapped to index', remap[i], 'which is', pal_dest[remap[i]])
 
