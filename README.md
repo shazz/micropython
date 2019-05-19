@@ -1,4 +1,11 @@
+
 [![Build Status](https://travis-ci.org/micropython/micropython.png?branch=master)](https://travis-ci.org/micropython/micropython) [![Coverage Status](https://coveralls.io/repos/micropython/micropython/badge.png?branch=master)](https://coveralls.io/r/micropython/micropython?branch=master)
+
+## !!! Please Read !!!
+
+This is an **unofficial** fork of the [MicroPython repository](https://github.com/micropython/micropython) dedicated to the KittenBot [Meowbit](https://www.kittenbot.cc/) device.
+
+It also includes backports of the official [Meowbit fork repository](https://github.com/KittenBot/micropython_meowbit).
 
 The MicroPython project
 =======================
