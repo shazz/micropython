@@ -226,6 +226,8 @@ STATIC mp_obj_t image_loadp16(size_t n_args, const mp_obj_t *args) {
         printf("Cannot load P16 image\n");
     }
 
+    f_close(&fp);
+
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(image_loadp16_obj, 2, 4, image_loadp16);
@@ -267,6 +269,8 @@ STATIC mp_obj_t image_loadp256(size_t n_args, const mp_obj_t *args) {
     else {
         printf("Cannot load P256 image\n");
     }
+
+    f_close(&fp);
 
     return mp_const_none;
 }

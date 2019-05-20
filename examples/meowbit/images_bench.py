@@ -9,6 +9,30 @@ import gc
 import machine
 
 @micropython.native
+def display(filename, fn, fb_size, fb_mode, fb_pal):
+    fbuf = bytearray(fb_size)
+    tft = pyb.SCREEN()
+    fb = framebuf.FrameBuffer(fbuf, 160, 128, fb_mode, 160, fb_pal)
+    img = image.Image(fb)
+    gtime = time.ticks_us
+    im_call = fn
+    dt = []
+
+    for i in range(0,20):
+        t0 = gtime()
+        im_call(filename)
+        t1 = gtime()
+        dt.append(time.ticks_diff(t1, t0))
+        tft.show(fb)
+
+    avg_dt = (sum(dt) / len(dt))/1000
+    fbuf = None
+    fb = None
+    img = None
+    gc.collect()
+    return avg_dt
+
+@micropython.native
 def display_jpeg(filename):
     fbuf = bytearray(160*128*2)
     tft = pyb.SCREEN()
@@ -84,15 +108,15 @@ def display_gif(filename):
 def display_p16(filename):
     fbuf = bytearray(80*128)
     tft = pyb.SCREEN()
-    fb = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL16, 160, framebuf.FRAMEBUF_PAL16_C64)
+    fb = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL16, 160, framebuf.PAL16_C64)
     img = image.Image(fb)
     gtime = time.ticks_us
-    gif = img.loadp16
+    p16 = img.loadp16
     dt = []
 
     for i in range(0,20):
         t0 = gtime()
-        gif(filename)
+        p16(filename)
         t1 = gtime()
         dt.append(time.ticks_diff(t1, t0))
         tft.show(fb)
@@ -111,12 +135,12 @@ def display_p256(filename):
     fb = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL256, 160, framebuf.PAL256_884)
     img = image.Image(fb)
     gtime = time.ticks_us
-    p16 = img.loadp256
+    p256 = img.loadp256
     dt = []
 
     for i in range(0,20):
         t0 = gtime()
-        p16(filename)
+        p256(filename)
         t1 = gtime()
         dt.append(time.ticks_diff(t1, t0))
         tft.show(fb)
@@ -128,9 +152,55 @@ def display_p256(filename):
     gc.collect()
     return avg_dt              
 
+@micropython.native
+def display_p16_py(filename):
+    fbuf = bytearray(80*128)
+    tft = pyb.SCREEN()
+    fb = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL16, 160, framebuf.PAL16_C64)
+    gtime = time.ticks_us
+    dt = []
+
+    for i in range(0,20):
+        t0 = gtime()
+        with open("images/test.p16", "rb") as f:
+            f.readinto(fbuf)
+        t1 = gtime()
+        dt.append(time.ticks_diff(t1, t0))
+        tft.show(fb)
+
+    avg_dt = (sum(dt) / len(dt))/1000
+    fbuf = None
+    fb = None
+    img = None
+    gc.collect()
+    return avg_dt  
+
+@micropython.native
+def display_p256_py(filename):
+    fbuf = bytearray(160*128)
+    tft = pyb.SCREEN()
+    fb = framebuf.FrameBuffer(fbuf, 160, 128, framebuf.PAL256, 160, framebuf.PAL256_884)
+    gtime = time.ticks_us
+    dt = []
+
+    for i in range(0,20):
+        t0 = gtime()
+        with open("images/test.p256", "rb") as f:
+            f.readinto(fbuf)
+        t1 = gtime()
+        dt.append(time.ticks_diff(t1, t0))
+        tft.show(fb)
+
+    avg_dt = (sum(dt) / len(dt))/1000
+    fbuf = None
+    fb = None
+    img = None
+    gc.collect()
+    return avg_dt      
+
 def run_tests():
 
-    results_str = "deocder;format;CPU;AHB;APB1;APB2;average time in ms\n"
+    results_str = "Decoder;Format;CPU;AHB;APB1;APB2;Average time in ms\n"
     freqs_test = [
         [56000000, 56000000, 14000000, 28000000],
         [84000000, 84000000, 42000000, 84000000]
@@ -141,7 +211,7 @@ def run_tests():
         led.on()
 
     for freqs in freqs_test:
-        fr_cols = ';'.join(str(f) for f in freqs)
+        fr_cols = ';'.join(str(int(f/1000000)) for f in freqs)
         pyb.freq(freqs[0], freqs[1], freqs[2], freqs[3])
 
         avg_dt_jpg = display_jpeg("images/test3.jpg")
@@ -159,11 +229,17 @@ def run_tests():
         #avg_dt_gif = display_gif("images/test256.gif")
         #results_str += "{};{};{};{}\n".format("gif", "RGB565", fr_cols, avg_dt_gif)        
 
-        #avg_dt_p16 = display_p16("images/test.p16")
-        #results_str += "{};{};{};{}\n".format("p16", "PAL16", fr_cols, avg_dt_p16)     
+        avg_dt_p16 = display_p16("images/test.p16")
+        results_str += "{};{};{};{}\n".format("p16", "PAL16", fr_cols, avg_dt_p16)    
 
-        #avg_dt_p256 = display_p256("images/test.p256")
-        #results_str += "{};{};{};{}\n".format("p256", "PAL256", fr_cols, avg_dt_p256)             
+        avg_dt_p16_py = display_p16_py("images/test.p16")
+        results_str += "{};{};{};{}\n".format("p16_py", "PAL16", fr_cols, avg_dt_p16_py)            
+
+        avg_dt_p256 = display_p256("images/test.p256")
+        results_str += "{};{};{};{}\n".format("p256", "PAL256", fr_cols, avg_dt_p256)
+
+        avg_dt_p256_py = display_p256_py("images/test.p256")
+        results_str += "{};{};{};{}\n".format("p256_py", "PAL256", fr_cols, avg_dt_p256_py)                             
 
     print(results_str)
 
